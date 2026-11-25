@@ -71,6 +71,25 @@
   .day-temps { font-size:12px; }
   footer { padding-top:4px; font-size:9px; }
 }
+  @media (max-height:480px) and (orientation:landscape) {
+  .page { min-height:calc(100vh - 12px); display:flex; flex-direction:column; }
+  .hero { flex:1; }
+  .section { flex:1; display:flex; flex-direction:column; justify-content:center; }
+  .temp { font-size:76px; }
+  .condition { font-size:20px; }
+  .feels { font-size:13px; }
+  .metric-label { font-size:10px; }
+  .metric-value { font-size:22px; }
+  .section-title { font-size:11px; }
+  .hour time { font-size:12px; }
+  .symbol { font-size:24px; margin:4px 0; }
+  .hour strong { font-size:16px; }
+  .rain { font-size:11px; }
+  .day-name { font-size:13px; }
+  .day-symbol { font-size:22px; }
+  .day-temps { font-size:14px; }
+  footer { font-size:10px; }
+}
 </style>
 </head>
 <body>
