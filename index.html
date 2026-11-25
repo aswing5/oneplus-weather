@@ -110,7 +110,6 @@ function render(d) {
   $("feels").textContent="Feels like "+round(c.apparent_temperature)+"° · Humidity "+c.relative_humidity_2m+"%";
   $("high").textContent=round(day.temperature_2m_max[0])+"°";
   $("low").textContent=round(day.temperature_2m_min[0])+"°";
-  $("rain").textContent=(h.precipitation_probability[start] ?? "—")+"%";
   $("wind").textContent=round(c.wind_speed_10m)+" km/h";
   $("sunrise").textContent=fmtTime(day.sunrise[0]);
   $("sunset").textContent=fmtTime(day.sunset[0]);
@@ -118,6 +117,7 @@ function render(d) {
   $("date").textContent=now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric",timeZone:"Europe/Stockholm"});
   let start=h.time.findIndex(t=>new Date(t).getTime()>=now.getTime());
   if(start<0) start=0;
+  $("rain").textContent=(h.precipitation_probability[start] ?? "—")+"%";
   const indices=[]; for(let i=start;i<Math.min(start+8,h.time.length);i++) indices.push(i);
   $("hourly").innerHTML=indices.map(i=>{
     const [label,sym]=weather(h.weather_code[i]);
