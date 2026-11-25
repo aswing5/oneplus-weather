@@ -184,6 +184,14 @@ async function load() {
     $("updated").textContent="UPDATE FAILED";
   }
 }
+  function nightCheck() {
+  const h = Number(new Date().toLocaleString("en-GB", { hour: "2-digit", hour12: false, timeZone: "Europe/Stockholm" }));
+  const night = h >= 22 || h < 7;
+  document.body.style.visibility = night ? "hidden" : "visible";
+  document.documentElement.style.background = night ? "#000" : "";
+}
+nightCheck();
+setInterval(nightCheck, 60 * 1000);
 load();
 setTimeout(()=>{ $("updated").textContent += " · " + innerWidth + "×" + innerHeight; }, 3000);
 setInterval(load,60*60*1000);
