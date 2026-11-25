@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#f4f2e9">
+<title>Stockholm Weather</title>
+<style>
+  :root { color-scheme: light; --paper:#f4f2e9; --ink:#171713; --muted:#55554d; --rule:#aaa99e; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; width:100%; min-height:100%; background:var(--paper); color:var(--ink); }
+  body { font-family: Georgia, "Times New Roman", serif; padding:clamp(12px,2.1vw,28px); }
+  .page { max-width:1100px; margin:0 auto; }
+  header { display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--ink); padding-bottom:9px; gap:16px; }
+  .place { font:700 clamp(17px,2.1vw,25px)/1.1 Arial,sans-serif; letter-spacing:.12em; }
+  .date { font:14px Arial,sans-serif; color:var(--muted); text-align:right; }
+  .hero { display:grid; grid-template-columns:1.2fr 1fr; align-items:center; gap:20px; padding:clamp(12px,2.2vw,25px) 0; border-bottom:1px solid var(--rule); }
+  .temp { font:normal clamp(76px,13vw,150px)/.88 Arial,sans-serif; letter-spacing:-.075em; }
+  .condition { font: bold clamp(19px,2.6vw,30px) Arial,sans-serif; margin-top:12px; }
+  .feels { font:15px Arial,sans-serif; color:var(--muted); margin-top:7px; }
+  .hero-right { display:grid; grid-template-columns:1fr 1fr; gap:14px 22px; }
+  .metric-label,.section-label { font: bold 11px Arial,sans-serif; letter-spacing:.14em; color:var(--muted); text-transform:uppercase; }
+  .metric-value { font: bold clamp(20px,3vw,32px) Arial,sans-serif; margin-top:5px; }
+  .section { padding:14px 0; border-bottom:1px solid var(--rule); }
+  .section-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; }
+  .section-title { font:bold 12px Arial,sans-serif; letter-spacing:.15em; }
+  .hourly { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:6px; }
+  .hour { text-align:center; min-width:0; }
+  .hour time { display:block; font:12px Arial,sans-serif; color:var(--muted); }
+  .symbol { font:26px Arial,sans-serif; margin:5px 0; }
+  .hour strong { font:bold 17px Arial,sans-serif; }
+  .rain { display:block; font:11px Arial,sans-serif; color:var(--muted); margin-top:5px; }
+  .days { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
+  .day { display:grid; grid-template-columns:1fr auto; align-items:center; gap:4px 8px; padding:4px 0; }
+  .day-name { font:bold 13px Arial,sans-serif; letter-spacing:.04em; }
+  .day-symbol { grid-row:span 2; grid-column:2; font:24px Arial,sans-serif; }
+  .day-temps { font:14px Arial,sans-serif; color:var(--muted); }
+  footer { display:flex; justify-content:space-between; gap:12px; padding-top:10px; font:11px Arial,sans-serif; color:var(--muted); }
+  .status { text-align:right; }
+  .error { border:1px solid var(--ink); padding:10px; margin-top:12px; font:13px Arial,sans-serif; display:none; }
+  @media (max-width:650px) {
+    body { padding:12px; }
+    .hero { grid-template-columns:1fr; gap:18px; }
+    .hero-right { grid-template-columns:repeat(4,1fr); }
+    .hourly { grid-template-columns:repeat(6,minmax(0,1fr)); row-gap:12px; }
+    .days { grid-template-columns:1fr; }
+    .day { grid-template-columns:1fr auto auto; }
+    .day-symbol { grid-row:auto; grid-column:auto; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <div class="place">STOCKHOLM <span style="font-weight:400">/ WEATHER</span></div>
+    <div class="date" id="date">Loading local date…</div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="temp" id="temperature">—°</div>
+      <div class="condition" id="condition">Loading forecast</div>
+      <div class="feels" id="feels">Feels like —°</div>
+    </div>
+    <div class="hero-right">
+      <div><div class="metric-label">Today high</div><div class="metric-value" id="high">—°</div></div>
+      <div><div class="metric-label">Today low</div><div class="metric-value" id="low">—°</div></div>
+      <div><div class="metric-label">Rain now / next hour</div><div class="metric-value" id="rain">—%</div></div>
+      <div><div class="metric-label">Wind</div><div class="metric-value" id="wind">— km/h</div></div>
+      <div><div class="metric-label">Sunrise</div><div class="metric-value" id="sunrise">—</div></div>
+      <div><div class="metric-label">Sunset</div><div class="metric-value" id="sunset">—</div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div class="section-title">HOURLY FORECAST</div><div class="metric-label">NEXT 8 HOURS</div></div>
+    <div class="hourly" id="hourly"><div class="hour">Fetching weather…</div></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div class="section-title">FIVE-DAY OUTLOOK</div><div class="metric-label">HIGH / LOW</div></div>
+    <div class="days" id="days"><div>Fetching forecast…</div></div>
+  </section>
+
+  <div class="error" id="error"></div>
+  <footer><span>DATA: OPEN-METEO · STOCKHOLM</span><span class="status" id="updated">Updating…</span></footer>
+</main>
+<script>
+const URL = "https://api.open-meteo.com/v1/forecast?latitude=59.3293&longitude=18.0686&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FStockholm&forecast_days=5";
+const $ = id => document.getElementById(id);
+const fmtTime = s => s ? s.slice(11,16) : "—";
+const dayName = (s,i) => i===0 ? "TODAY" : new Date(s+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",timeZone:"Europe/Stockholm"}).toUpperCase();
+function weather(code) {
+  if (code===0) return ["Clear","☀"];
+  if ([1,2].includes(code)) return ["Partly cloudy","◐"];
+  if (code===3) return ["Overcast","☁"];
+  if ([45,48].includes(code)) return ["Fog","≋"];
+  if ([51,53,55,56,57].includes(code)) return ["Drizzle","☂"];
+  if ([61,63,65,66,67,80,81,82].includes(code)) return ["Rain","☂"];
+  if ([71,73,75,77,85,86].includes(code)) return ["Snow","❄"];
+  if ([95,96,99].includes(code)) return ["Thunderstorm","ϟ"];
+  return ["Changeable","○"];
+}
+function round(v) { return Math.round(v); }
+function render(d) {
+  const c=d.current, day=d.daily, h=d.hourly;
+  const [desc] = weather(c.weather_code);
+  $("temperature").textContent=round(c.temperature_2m)+"°";
+  $("condition").textContent=desc;
+  $("feels").textContent="Feels like "+round(c.apparent_temperature)+"° · Humidity "+c.relative_humidity_2m+"%";
+  $("high").textContent=round(day.temperature_2m_max[0])+"°";
+  $("low").textContent=round(day.temperature_2m_min[0])+"°";
+  $("rain").textContent=(h.precipitation_probability[start] ?? "—")+"%";
+  $("wind").textContent=round(c.wind_speed_10m)+" km/h";
+  $("sunrise").textContent=fmtTime(day.sunrise[0]);
+  $("sunset").textContent=fmtTime(day.sunset[0]);
+  const now=new Date();
+  $("date").textContent=now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric",timeZone:"Europe/Stockholm"});
+  let start=h.time.findIndex(t=>new Date(t).getTime()>=now.getTime());
+  if(start<0) start=0;
+  const indices=[]; for(let i=start;i<Math.min(start+8,h.time.length);i++) indices.push(i);
+  $("hourly").innerHTML=indices.map(i=>{
+    const [label,sym]=weather(h.weather_code[i]);
+    return `<div class="hour"><time>${fmtTime(h.time[i])}</time><div class="symbol" aria-label="${label}">${sym}</div><strong>${round(h.temperature_2m[i])}°</strong><span class="rain">${h.precipitation_probability[i] ?? "—"}% rain</span></div>`;
+  }).join("");
+  $("days").innerHTML=day.time.map((t,i)=>{
+    const [label,sym]=weather(day.weather_code[i]);
+    return `<div class="day"><div class="day-name">${dayName(t,i)}</div><div class="day-symbol" aria-label="${label}">${sym}</div><div class="day-temps">${round(day.temperature_2m_max[i])}° / ${round(day.temperature_2m_min[i])}°</div></div>`;
+  }).join("");
+  $("updated").textContent="UPDATED "+now.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Stockholm"});
+  $("error").style.display="none";
+}
+async function load() {
+  try {
+    const r=await fetch(URL,{cache:"no-store"});
+    if(!r.ok) throw new Error("Weather service returned "+r.status);
+    render(await r.json());
+  } catch(e) {
+    $("error").style.display="block";
+    $("error").textContent="Weather data could not be loaded. Check Wi-Fi and reload this page. ("+e.message+")";
+    $("updated").textContent="UPDATE FAILED";
+  }
+}
+load();
+setInterval(load,60*60*1000);
+</script>
+</body>
+</html>
