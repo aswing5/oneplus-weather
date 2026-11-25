@@ -193,7 +193,6 @@ async function load() {
 nightCheck();
 setInterval(nightCheck, 60 * 1000);
 load();
-setTimeout(()=>{ $("updated").textContent += " · " + innerWidth + "×" + innerHeight; }, 3000);
 setInterval(load,60*60*1000);
 </script>
 </body>
