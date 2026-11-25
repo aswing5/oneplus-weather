@@ -133,8 +133,8 @@ const URL = "https://api.open-meteo.com/v1/forecast?latitude=59.3293&longitude=1
 const $ = id => document.getElementById(id);
 const fmtTime = s => s ? s.slice(11,16) : "—";
 const dayName = (s,i) => i===0 ? "TODAY" : new Date(s+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",timeZone:"Europe/Stockholm"}).toUpperCase();
-function weather(code) {
-  if (code===0) return ["Clear","☀"];
+function weather(code, isDay=1) {
+  if (code===0) return ["Clear", isDay ? "☀" : "☾"];
   if ([1,2].includes(code)) return ["Partly cloudy","◐"];
   if (code===3) return ["Overcast","☁"];
   if ([45,48].includes(code)) return ["Fog","≋"];
@@ -163,7 +163,7 @@ function render(d) {
   $("rain").textContent=(h.precipitation_probability[start] ?? "—")+"%";
   const indices=[]; for(let i=start;i<Math.min(start+8,h.time.length);i++) indices.push(i);
   $("hourly").innerHTML=indices.map(i=>{
-    const [label,sym]=weather(h.weather_code[i]);
+    const [label,sym]=weather(h.weather_code[i], h.is_day[i]);
     return `<div class="hour"><time>${fmtTime(h.time[i])}</time><div class="symbol" aria-label="${label}">${sym}</div><strong>${round(h.temperature_2m[i])}°</strong><span class="rain">${h.precipitation_probability[i] ?? "—"}% rain</span></div>`;
   }).join("");
   $("days").innerHTML=day.time.map((t,i)=>{
