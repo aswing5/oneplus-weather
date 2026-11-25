@@ -47,6 +47,30 @@
     .day { grid-template-columns:1fr auto auto; }
     .day-symbol { grid-row:auto; grid-column:auto; }
   }
+  @media (max-height:480px) and (orientation:landscape) {
+  body { padding:6px 14px; }
+  header { padding-bottom:4px; }
+  .place { font-size:15px; }
+  .date { font-size:12px; }
+  .hero { padding:6px 0; gap:12px; }
+  .temp { font-size:58px; }
+  .condition { font-size:16px; margin-top:4px; }
+  .feels { font-size:11px; margin-top:2px; }
+  .hero-right { grid-template-columns:repeat(3,1fr); gap:4px 12px; }
+  .metric-label { font-size:9px; }
+  .metric-value { font-size:18px; margin-top:2px; }
+  .section { padding:6px 0; }
+  .section-head { margin-bottom:4px; }
+  .section-title { font-size:10px; }
+  .hour time { font-size:10px; }
+  .symbol { font-size:18px; margin:2px 0; }
+  .hour strong { font-size:13px; }
+  .rain { font-size:9px; margin-top:2px; }
+  .day-name { font-size:11px; }
+  .day-symbol { font-size:18px; }
+  .day-temps { font-size:12px; }
+  footer { padding-top:4px; font-size:9px; }
+}
 </style>
 </head>
 <body>
