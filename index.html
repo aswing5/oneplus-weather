@@ -129,7 +129,7 @@
   <footer><span>DATA: OPEN-METEO · STOCKHOLM</span><span class="status" id="updated">Updating…</span></footer>
 </main>
 <script>
-const URL = "https://api.open-meteo.com/v1/forecast?latitude=59.3293&longitude=18.0686&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FStockholm&forecast_days=5";
+const URL = "https://api.open-meteo.com/v1/forecast?latitude=59.3293&longitude=18.0686&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m&hourly=temperature_2m,precipitation_probability,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FStockholm&forecast_days=5";
 const $ = id => document.getElementById(id);
 const fmtTime = s => s ? s.slice(11,16) : "—";
 const dayName = (s,i) => i===0 ? "TODAY" : new Date(s+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",timeZone:"Europe/Stockholm"}).toUpperCase();
